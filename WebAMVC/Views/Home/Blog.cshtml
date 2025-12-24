@@ -1,8 +1,4 @@
 ﻿
-@{
-    ViewData["Title"] = "Blog";
-}
-
 <section class="bg-dark pt-20 pb-120">
     <div class="container">
 
@@ -37,7 +33,7 @@
                     </ul>
                     <div class="d-flex justify-content-between align-items-end text-dark blog-title-section">
                         <h4 class="fw-bold font-Syne transition-all leading-8 blog-title">
-                            <a href="/Home/BlogDetails">
+                            <a asp-controller="Home" asp-action="Blog">
                                 Right-lo-left
                                 behind development in mobile web design
                             </a>
