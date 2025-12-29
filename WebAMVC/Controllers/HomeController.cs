@@ -1,18 +1,27 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using WebAMVC.Models;
+using Dapper;
+using Microsoft.Data.SqlClient;
+using System.Data;
 
 namespace WebAMVC.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
+        //private readonly ILogger<HomeController> _logger;
 
-        public HomeController(ILogger<HomeController> logger)
+        private readonly string _constr;
+        public HomeController(IConfiguration configuration)
         {
-            _logger = logger;
+            _constr = configuration.GetConnectionString("DefaultConnection");
         }
-
+        //public HomeController(ILogger<HomeController> logger)
+        //{
+        //    _logger = logger;
+        //}
+        private IDbConnection GetConnection() => new SqlConnection(_constr);
+        
         public IActionResult Index()
         {
             ViewData["Title"] = "Home";
@@ -42,12 +51,29 @@ namespace WebAMVC.Controllers
             ViewData["Keywords"] = "Blog, blog page";
             return View();
         }
+        [HttpGet]
         public IActionResult Contact()
         {
             ViewData["Title"] = "Contact Us";
             ViewData["Description"] = "Contact us page description";
             ViewData["Keywords"] = "Contact, Contact page,Support";
             return View();
+        }
+        [HttpPost]
+        public async Task<IActionResult> Contact(User user)
+        {
+             ModelState.Remove("Id");
+            if (!ModelState.IsValid)
+            {
+                return View(user);
+            }
+            var connection = GetConnection();
+            string sql = "INSERT INTO Users (FirstName, LastName, Email, Phone, Password) VALUES (@FirstName, @LastName, @Email, @Phone, @Password)";
+            var result =await connection.ExecuteAsync(sql, user);
+
+            // Here you can handle the form submission, e.g., save to database or send an email
+
+            return RedirectToAction("Index");
         }
         public IActionResult Projects()
         {
